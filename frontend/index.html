@@ -1,0 +1,123 @@
+<!--index.html-->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="icon" href="public/icon/favicon.ico">
+    <link rel="stylesheet" href="../node_modules/bootstrap/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="../node_modules/bootstrap/dist/css/bootstrap-grid.min.css">
+
+    <style>
+        table {
+            font-family: arial, sans-serif;
+            border-collapse: collapse;
+            width: 100%;
+        }
+
+        td, th {
+            border: 1px solid #dddddd;
+            text-align: left;
+            padding: 8px;
+        }
+
+        tr:nth-child(even) {
+            background-color: #dddddd;
+        }
+
+        label {
+            font-size: 25px;
+        }
+
+        table {
+            overflow-x: auto;
+            overflow-y:auto;
+            height:100px;
+        }
+    </style>
+
+    <title>Subway Utilities</title>
+</head>
+
+<body>
+    <h1 class="p-lg-3 text-center">Subway Utilities</h1>
+
+
+    <div class="container m-3">
+        <div class="container align-content-center">
+            <form class="row">
+                <div class="col m-3 text-center">
+                    <label for="CSVPath" class="m-3">Path To CSV</label>
+                    <br>
+                    <input class="m-3 form-control" type="text" id="CSVPath" name="CSVPath" accept="text/csv" placeholder="Paste the path to .csv file">
+                </div>
+                <div class="col m-3 text-center">
+                    <label for="CSVFile" class="m-3 form-label">CSV File</label>
+                    <br>
+                    <input class="m-3 form-control" type="file" id="CSVFile" name="CSVFile" accept=".csv" value="CSV">
+                </div>
+                <div class="col m-3 text-center">
+                    <label for="extractData" class="m-3 form-label">Press button once file selected.</label>
+                    <br>
+                    <button id="extractData" name="extractData" type="submit" class="btn btn-success" onclick="f()">Extract Data</button>
+                </div>
+
+            </form>
+        </div>
+    </div>
+
+    <div class="container m-3" id="employeeInfo">
+        <div class="row">
+            <label class="text-center" for="employeeTotalInfo">Total Info </label>
+            <div class="col">
+                <table id="employeeTotalInfo">
+                    <thead id="employeeTotalInfoHeaders">
+                    <tr>
+                        <th>
+                            Name
+                        </th>
+                        <th>
+                            Total Tip
+                        </th>
+                    </tr>
+                    </thead>
+                    <tbody id="employeeTotalInfoBody">
+                    </tbody>
+                </table>
+            </div>
+
+            <label class="text-center" for="ParsedData">Data from File</label>
+            <div class="col">
+
+                <table id="ParsedData" class="text-center">
+                    <thead id="ParsedDataHeaders">
+                        <tr>
+                            <th>
+                                Employee
+                            </th>
+                            <th>
+                                Date - Time
+                            </th>
+                            <th>
+                                Tip Transaction Number
+                            </th>
+                            <th>
+                                Tip Amount
+                            </th>
+                            <th>
+                                Add/Remove
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody id="ParsedDataBody">
+                    </tbody>
+
+                </table>
+            </div>
+        </div>
+    </div>
+    <!-- You can also require other files to run in this process -->
+    <script src="index.js"></script>
+
+</body>
+</html>

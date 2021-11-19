@@ -1,0 +1,34 @@
+{
+  "name": "subwayutilities",
+  "version": "1.0.0",
+  "description": "Unofficial Subway Accounting Software",
+  "main": "./frontend/app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "postinstall": "node_modules/.bin/install-app-deps",
+    "start": "node_modules/.bin/electron .",
+    "buildMac": "electron-packager . SubwayUtilities --ignore=node_modules/electron-* && cp ./public/build/icon.icns SubwayUtilities-darwin-x64/SubwayUtilities.app/Contents/Resources/electron.icns",
+    "buildWin": "electron-packager . SubwayUtilities --overwrite --asar --platform=win32 --arch=ia32 --icon=./public/build/icon.ico --prune=true --out=release-builds --version-string.CompanyName=CE --version-string.FileDescription=CE --version-string.ProductName=\"SubwayUtilities\"",
+    "build": "electron-packager . SubwayUtilities --platform=all"
+  },
+  "author": "Aruksh Patel",
+  "license": "MIT",
+  "dependencies": {
+    "bootstrap": "^5.1.3",
+    "csv-parser": "^3.0.0",
+    "dotenv": "^10.0.0",
+    "ts-node": "^10.4.0"
+  },
+  "devDependencies": {
+    "electron": "^16.0.0",
+    "electron-packager": "^15.4.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/arukshpatel/SubwayUtilities.get"
+  },
+  "bugs": {
+    "url": "https://github.com/arukshpatel/SubwayUtilities/issues"
+  },
+  "homepage": "https://github.com/arukshpatel/SubwayUtilities#readme"
+}
