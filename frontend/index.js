@@ -9,7 +9,6 @@ const main = require('../backend/lib/csvFunctions/functions')
 const path = require('path');
 
 const form = document.querySelector('form');
-
 form.addEventListener('submit', submitPath);
 
 
@@ -100,7 +99,7 @@ function parsedDataTableFormat(name, transNum, tipAmount, dateTime)
     let tdDate = "<td>" + dateTime + "</td>\n";
     let tdTransNum = "<td>" + transNum + "</td>\n";
     let tdTipAmount = "<td>" + tipAmount + "</td>\n";
-    let checkbox = "<input type = \"checkbox\" id=\"" + name + transNum + "\" name=\"" + name + "\" value=\"" + transNum + "\" onclick=\"removeOrAdd(this.name, this.value)\" >\n";
+    let checkbox = "<input type = \"checkbox\" id=\"" + name + transNum + "\" name=\"" + name + "\" value=\"" + transNum + "\" onclick=\"removeOrAdd(this.name, this.value)\" class='text-center'>\n";
 
     return ("<tr>\n" + tdName + tdDate + tdTransNum + tdTipAmount + "<td>" + checkbox + "</td>" + "</tr>\n");
 }
@@ -108,7 +107,9 @@ function parsedDataTableFormat(name, transNum, tipAmount, dateTime)
 function updateTotalTable()
 {
     let totalTable;
+    let index = 0;
     main.employeesFullList.forEach(e => {
+
         totalTable += totalTableFormat(e.name, e.totalTip());
     });
     document.getElementById("employeeTotalInfoBody").innerHTML = totalTable;
