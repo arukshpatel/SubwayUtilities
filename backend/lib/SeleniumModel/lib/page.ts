@@ -1,6 +1,4 @@
 import { Browser }    from "./browser";
-import { WebElement } from "selenium-webdriver";
-import { Identifier } from "./utils";
 
 export interface NewablePage<T extends Page> {
     new(browser: Browser): T;

@@ -1,5 +1,5 @@
 import 'chromedriver';
-import { Builder, By, promise, ThenableWebDriver, until, WebElementPromise } from "selenium-webdriver";
+import { Builder, By, ThenableWebDriver, until, WebElementPromise } from "selenium-webdriver";
 import { Options }                                                           from "selenium-webdriver/chrome";
 import { Condition, HTMLQuery, Identifier, IdentifierError } from "./utils";
 
@@ -231,7 +231,7 @@ export class Browser
      * elementIdentifier
      */
     private async waitUntilElementIsVisible(findBy: Identifier): Promise<void> {
-        let elementSelector: string;
+
 
         if(findBy.HTMLQuery instanceof Array && findBy.elementIdentifier instanceof Array) {
             if(findBy.elementIdentifier.length !== findBy.HTMLQuery.length) {
@@ -239,7 +239,6 @@ export class Browser
             }
 
             for(let i = 0; i < findBy.elementIdentifier.length; i++) {
-                elementSelector = findBy.elementIdentifier[i];
 
                 if(findBy.HTMLQuery[i] === HTMLQuery.ID) {
                     await this.driver.wait(until.elementIsVisible(this.findElementById(findBy.elementIdentifier[i])));

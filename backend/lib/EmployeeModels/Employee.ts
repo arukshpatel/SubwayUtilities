@@ -77,8 +77,6 @@ export class Employee
 
         if(tipToBeRemoved === undefined && transactionNumber)
         {
-            let index = 0;
-
             this.tips.forEach(tip => {
                 if(tip.transactionNum === transactionNumber)
                 {
@@ -86,7 +84,6 @@ export class Employee
                     this.tips.splice(this.tips.indexOf(tip), 1);
                     return;
                 }
-                index++;
             });
         }
     }

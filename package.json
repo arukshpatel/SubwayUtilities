@@ -2,7 +2,7 @@
   "name": "subwayutilities",
   "version": "1.0.0",
   "description": "Unofficial Subway Accounting Software",
-  "main": "./frontend/app.js",
+  "main": "app.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "postinstall": "node_modules/.bin/install-app-deps",

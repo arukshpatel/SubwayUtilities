@@ -57,8 +57,6 @@ export function reAddTip(employeeName: string, transNumber: string)
     employeesFullList.forEach(e => {
         if(e.name === employeeName)
         {
-            let index: number = 0;
-
             e.tipsRemoved.tips.forEach(tip => {
                 if(tip.transactionNum === parseInt(transNumber))
                 {
