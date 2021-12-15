@@ -8,8 +8,8 @@
     "moduleResolution": "node",
     "baseUrl": "./",
     "typeRoots": [
-      "./node_modules/@types/"
-    ],
+       "./node_modules/@types/"
+     ],
     "allowJs": true,
     "sourceMap": true,
     "outDir": "./dist/",

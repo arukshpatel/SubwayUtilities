@@ -1,27 +1,78 @@
 import 'chromedriver';
-import { Builder, By, ThenableWebDriver, until, WebElementPromise } from "selenium-webdriver";
-import * as chrome                                                  from "selenium-webdriver/chrome";
-import { Conditions, HTMLQuery, Identifier, IdentifierError }       from "./utils";
-
+import { Builder, By, promise, ThenableWebDriver, until, WebElementPromise } from "selenium-webdriver";
+import { Options }                                                           from "selenium-webdriver/chrome";
+import { Condition, HTMLQuery, Identifier, IdentifierError } from "./utils";
 
 export class Browser
 {
-    private driver: ThenableWebDriver;
-    private chromeOptions: chrome.Options;
+    private readonly driver: ThenableWebDriver;
 
 
-    public constructor(public browserName: string, private isPrivate: boolean) {
-        this.chromeOptions = new chrome.Options().headless();
+    public constructor(private isPrivate: boolean = false, private isHeadless: boolean = true) {
 
-        if(isPrivate) {
-            this.chromeOptions.addArguments('--incognito');
-        }
-
-        this.driver = new Builder().forBrowser(browserName).setChromeOptions(this.chromeOptions).build();
+        this.driver = this.initDriver().build();
     }
 
-    public async navigate(url: string): Promise<void> {
-        await this.driver.navigate().to(url);
+    public getDriver(): ThenableWebDriver
+    {
+        return this.driver;
+    }
+
+    private initDriver(): Builder {
+
+        let chromeCapabilities: Options = new Options();
+
+        if(this.isPrivate) {
+            chromeCapabilities.addArguments('--incognito');
+        }
+
+        if(this.isHeadless) {
+            chromeCapabilities.headless();
+        }
+
+        chromeCapabilities.setAcceptInsecureCerts(true);
+
+        return new Builder().forBrowser('chrome').setChromeOptions(chromeCapabilities);
+    }
+
+
+    public async navigate(url: string) {
+        try{
+            await this.driver.get(url);
+        } catch(e) {
+            console.log("Cannot navigate.");
+        }
+
+    }
+
+    public Identify(selector: string): WebElementPromise {
+
+        if(selector.charAt(0) === '#')
+        {
+            return this.driver.wait(until.elementLocated(By.id(selector.split("#")[1])));
+
+        } else if(selector.charAt(0) === ".")
+        {
+
+            return this.driver.wait(until.elementLocated(By.className(selector.split('.')[1])));
+        }else
+        {
+            return this.driver.wait(until.elementLocated(By.name(selector)));
+        }
+    }
+
+    public findBy(selector: Identifier): WebElementPromise {
+        if(!selector.HTMLQuery)
+        {
+            throw new IdentifierError("HTMLQuery undefined")
+        }
+
+        if(selector.HTMLQuery instanceof Array || selector.elementIdentifier instanceof Array)
+        {
+            throw new IdentifierError("HTML Query or Element Identifier are of type string Array. Not Valid.")
+        }
+
+        return this.driver.findElement(new By(selector.HTMLQuery, selector.elementIdentifier));
     }
 
     public findElementById(idSelector: string): WebElementPromise {
@@ -44,16 +95,16 @@ export class Browser
     }
 
     public async waitUntil(waitUntil: Identifier): Promise<boolean | void> {
-        
+
         switch(waitUntil.condition) {
 
-        case Conditions.ElementIsVisible:
+        case Condition.ElementIsVisible:
             return await this.waitUntilElementIsVisible(waitUntil);
 
-        case Conditions.ElementIsPresent:
+        case Condition.ElementIsPresent:
             return await this.waitUntilElementIsPresent(waitUntil);
 
-        case Conditions.PageHasLoaded:
+        case Condition.PageHasLoaded:
             return await this.waitUntilPageHasLoaded(waitUntil);
 
         }
@@ -66,16 +117,22 @@ export class Browser
      * findBy.elementIdentifier has to be string "{URL}"
      * @private
      */
-    private async waitUntilPageHasLoaded(findBy: Identifier): Promise<boolean | undefined>
+    private async waitUntilPageHasLoaded(findBy: Identifier): Promise<boolean>
     {
-        if(!(findBy.elementIdentifier instanceof Array) && findBy.elementIdentifier)
+        if(findBy.elementIdentifier instanceof Array)
         {
-            return this.driver.wait(
-                until.urlIs(findBy.elementIdentifier),
-                findBy.timeOut,
-                "URL not loaded. Timed out")
+            throw new IdentifierError("elementIdentifer needs to be of type string, not string[]")
         }
-        return;
+
+        try{
+            this.driver.wait(until.urlContains(findBy.elementIdentifier), findBy.timeOut, "URL Not Loaded");
+
+            return true;
+
+        } catch(e) {
+
+            return false;
+        }
     }
 
     private async waitUntilElementIsPresent(findBy: Identifier): Promise<void> {
@@ -111,14 +168,14 @@ export class Browser
             return;
         }
 
-        if(typeof findBy.HTMLQuery === "number" && findBy.elementIdentifier)
+        if(typeof findBy.HTMLQuery === "string" && findBy.elementIdentifier instanceof Array)
         {
-            for(elementSelector of findBy.elementIdentifier)
+            for(let i = 0; i < findBy.elementIdentifier.length; i++)
             {
                 switch(findBy.HTMLQuery) {
                 case HTMLQuery.ID:
                     await this.driver.wait(
-                        until.elementIsEnabled(this.findElementById(elementSelector)),
+                        until.elementIsEnabled(this.findElementById(findBy.elementIdentifier[i])),
                         findBy.timeOut,
                         'Could not find element. Timed Out.'
                     );
@@ -126,7 +183,7 @@ export class Browser
 
                 case HTMLQuery.CSS:
                     await this.driver.wait(
-                        until.elementIsEnabled(this.findElementByCSS(elementSelector)),
+                        until.elementIsEnabled(this.findElementByCSS(findBy.elementIdentifier[i])),
                         findBy.timeOut,
                         'Could not find element. Timed Out.'
                     );
@@ -135,6 +192,30 @@ export class Browser
                 case HTMLQuery.JS:
                     return;
                 }
+            }
+        }
+
+        if(typeof findBy.HTMLQuery === "string" && typeof findBy.elementIdentifier === "string")
+        {
+            switch(findBy.HTMLQuery) {
+            case HTMLQuery.ID:
+                await this.driver.wait(
+                    until.elementIsEnabled(this.findElementById(findBy.elementIdentifier)),
+                    findBy.timeOut,
+                    'Could not find element. Timed Out.'
+                );
+                return;
+
+            case HTMLQuery.CSS:
+                await this.driver.wait(
+                    until.elementIsEnabled(this.findElementByCSS(findBy.elementIdentifier)),
+                    findBy.timeOut,
+                    'Could not find element. Timed Out.'
+                );
+                return;
+
+            case HTMLQuery.JS:
+                return;
             }
         }
 
@@ -161,28 +242,45 @@ export class Browser
                 elementSelector = findBy.elementIdentifier[i];
 
                 if(findBy.HTMLQuery[i] === HTMLQuery.ID) {
-                    await this.driver.wait(until.elementIsVisible(this.findElementById(elementSelector)));
+                    await this.driver.wait(until.elementIsVisible(this.findElementById(findBy.elementIdentifier[i])));
 
                 } else if(findBy.HTMLQuery[i] === HTMLQuery.CSS) {
-                    await this.driver.wait(until.elementIsVisible(this.findElementByCSS(elementSelector)));
+                    await this.driver.wait(until.elementIsVisible(this.findElementByCSS(findBy.elementIdentifier[i])));
                 }
 
             }
         }
 
-        if(typeof findBy.HTMLQuery === "number" && findBy.elementIdentifier) {
-            for(elementSelector of findBy.elementIdentifier) {
+        if(typeof findBy.HTMLQuery === "string" && findBy.elementIdentifier instanceof Array) {
+
+            for(let i = 0; i < findBy.elementIdentifier.length; i++)
+            {
                 if(findBy.HTMLQuery === HTMLQuery.ID) {
                     try {
-                        await this.driver.wait(until.elementIsVisible(this.findElementById(elementSelector)));
+                        await this.driver.wait(until.elementIsVisible(this.findElementById(findBy.elementIdentifier[i])));
                     } catch(e) {
 
-                        continue;
+                        console.log("Could not find element: " + findBy.HTMLQuery)
                     }
 
                 } else if(findBy.HTMLQuery === HTMLQuery.CSS) {
-                    await this.driver.wait(until.elementIsVisible(this.findElementByCSS(elementSelector)));
+                    await this.driver.wait(until.elementIsVisible(this.findElementByCSS(findBy.elementIdentifier[i])));
                 }
+            }
+        }
+
+        if(typeof findBy.HTMLQuery === "string" && typeof findBy.elementIdentifier === "string") {
+
+            if(findBy.HTMLQuery === HTMLQuery.ID) {
+                try {
+                    await this.driver.wait(until.elementIsVisible(this.findElementById(findBy.elementIdentifier)));
+                } catch(e) {
+
+                    console.log("Could not find element: " + findBy.HTMLQuery)
+                }
+
+            } else if(findBy.HTMLQuery === HTMLQuery.CSS) {
+                await this.driver.wait(until.elementIsVisible(this.findElementByCSS(findBy.elementIdentifier)));
             }
         }
     }

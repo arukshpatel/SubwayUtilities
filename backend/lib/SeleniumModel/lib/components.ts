@@ -1,8 +1,9 @@
 import { WebElementPromise } from "selenium-webdriver";
+import { Identifier }        from "./utils";
 
 export class WebComponent
 {
-    constructor(protected element: WebElementPromise, public selector: string) {}
+    constructor(protected element: WebElementPromise, public identifier?: Identifier) {}
 
     public async click() {
         try {
@@ -31,8 +32,8 @@ export class WebComponent
 }
 
 export class Button extends WebComponent {
-    constructor(element: WebElementPromise, selector: string) {
-        super(element, selector);
+    constructor(element: WebElementPromise, identifier?: Identifier) {
+        super(element, identifier);
     }
 
     public async isDisabled() {
@@ -45,11 +46,16 @@ export class Button extends WebComponent {
 }
 
 export class TextInput extends WebComponent {
-    constructor(element: WebElementPromise, selector: string) {
-        super(element, selector);
+    constructor(element: WebElementPromise, identifier?: Identifier) {
+        super(element, identifier);
     }
 
-    public type(text: string) {
+    public async type(text: string) {
+        console.log(await this.element.getTagName());
         return this.element.sendKeys(text);
+    }
+
+    public getElement(): WebElementPromise {
+        return this.element;
     }
 }

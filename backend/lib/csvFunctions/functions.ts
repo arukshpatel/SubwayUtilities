@@ -1,4 +1,4 @@
-import { Employee } from "../Models/Employee";
+import { Employee } from "../EmployeeModels/Employee";
 
 export const results: string[] = [];
 
